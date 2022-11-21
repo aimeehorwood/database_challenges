@@ -10,10 +10,10 @@ In this template, we'll use an example table students
 
 # EXAMPLE
 
-Table: students
+Table: albums
 
 Columns:
-id | name | cohort_name
+id | title | release_year
 
 2. Create Test SQL seeds
 Your tests will depend on data stored in PostgreSQL to run.
@@ -21,7 +21,7 @@ Your tests will depend on data stored in PostgreSQL to run.
 If seed data is provided (or you already created it), you can skip this step.
 
 -- EXAMPLE
--- (file: spec/seeds_{table_name}.sql)
+-- (file: spec/seeds_music_library.sql)
 
 -- Write your SQL seed here. 
 
@@ -29,31 +29,48 @@ If seed data is provided (or you already created it), you can skip this step.
 -- so we can start with a fresh state.
 -- (RESTART IDENTITY resets the primary key)
 
-TRUNCATE TABLE students RESTART IDENTITY; -- replace with your own table name.
+TRUNCATE TABLE artists RESTART IDENTITY; -- replace with your own table name.
 
 -- Below this line there should only be `INSERT` statements.
 -- Replace these statements with your own seed data.
 
-INSERT INTO students (name, cohort_name) VALUES ('David', 'April 2022');
-INSERT INTO students (name, cohort_name) VALUES ('Anna', 'May 2022');
+INSERT INTO albums (title,release_year,artist_id) VALUES ('Louis Armstrong Hits', '1970','1');
+INSERT INTO albums (title,release_year,artist_id) VALUES ('Buzzard Buzzard Buzzard', '2022', '2');
+
+
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
 
-psql -h 127.0.0.1 your_database_name < seeds_{table_name}.sql
+psql -h 127.0.0.1 music_library_test < spec/seeds_artists.sql
+
+
 3. Define the class names
 Usually, the Model class name will be the capitalised table name (single instead of plural). The same name is then suffixed by Repository for the Repository class name.
 
 # EXAMPLE
-# Table name: students
+# Table name: albums
 
 # Model class
-# (in lib/student.rb)
-class Student
+# (in lib/albums.rb)
+class Album
+attr_accessor :title, :id, :release_year
 end
 
 # Repository class
 # (in lib/student_repository.rb)
-class StudentRepository
+class AlbumRepository
+
+def all_albums
+albums = []
+sql = 'SELECT id, title FROM albums;'
+album_set = DatabaseConnection.exec_params(sql,[])
+album_set.each do |album|
+  albums.push("#{album[:id]}: #{album[:title]}")
 end
+albums
+
+end
+
+
 4. Implement the Model class
 Define the attributes of your Model class. You can usually map the table columns to the attributes of the class, including primary and foreign keys.
 
@@ -83,43 +100,24 @@ Your Repository class will need to implement methods for each "read" or "write" 
 
 Using comments, define the method signatures (arguments and return value) and what they do - write up the SQL queries that will be used by each method.
 
-# EXAMPLE
-# Table name: students
-
-# Repository class
-# (in lib/student_repository.rb)
-
-class StudentRepository
-
-  # Selecting all records
-  # No arguments
-  def all
-    # Executes the SQL query:
-    # SELECT id, name, cohort_name FROM students;
-
-    # Returns an array of Student objects.
-  end
-
-  # Gets a single record by its ID
-  # One argument: the id (number)
-  def find(id)
-    # Executes the SQL query:
-    # SELECT id, name, cohort_name FROM students WHERE id = $1;
-
-    # Returns a single Student object.
-  end
 
   # Add more methods below for each operation you'd like to implement.
 
   # def create(student)
+  #execute the SQL query:
+  INSERT TO albums (title,release_year,artist_id)
+  VALUES ('Bob Marley Greatest Hits','1990','6')
   # end
 
   # def update(student)
+  UPDATE albums SET 'Bob Marley Greatest Hits' = 'Best of Bob Marley' WHERE artist_id = '6'; 
   # end
 
   # def delete(student)
+  DELETE FROM albums WHERE album.title = album;
   # end
-end
+
+
 6. Write Test Examples
 Write Ruby code that defines the expected behaviour of the Repository class, following your design from the table written in step 5.
 
@@ -128,32 +126,45 @@ These examples will later be encoded as RSpec tests.
 # EXAMPLES
 
 # 1
-# Get all students
+# Get all albums
 
-repo = StudentRepository.new
+albums = AlbumsRepository.new
 
-students = repo.all
+list_of_album = albums.all
 
-students.length # =>  2
+list_of_albums.length # =>  2
 
-students[0].id # =>  1
-students[0].name # =>  'David'
-students[0].cohort_name # =>  'April 2022'
+list_of_albums[0].id # =>  1
+list_of_albums[0].title # =>  'Louis Armstrong Hits'
+list_of_albums[0].release_year # =>  1970
 
-students[1].id # =>  2
-students[1].name # =>  'Anna'
-students[1].cohort_name # =>  'May 2022'
+list_of_albums[1].id # =>  2
+list_of_albums[1].title # =>  'Buzzard Buzzard Buzzard'
+list_of_albums[1].release_year # =>  2022
+
 
 # 2
-# Get a single student
+# Create a single album 
 
-repo = StudentRepository.new
+album = AlbumRepository.new
 
-student = repo.find(1)
+new_addition = album.create('Bob Marley Greatest Hits',1990,'6')
+album.all => 'Bob Marley Greatest Hits',1990,'6'
 
-student.id # =>  1
-student.name # =>  'David'
-student.cohort_name # =>  'April 2022'
+
+##3 delete a single album 
+new_addition = album.create('Bob Marley Greatest Hits',1990,'6')
+album.delete(id)
+album.all => []
+
+
+##4 update album
+new_addition = album.create('Bub Marley Greatest Hits',1990,'6')
+album.all => 'Bub Marley Greatest Hits',1990,'6'
+album.update(id,updated_title,updated_year)
+album.all => 
+
+
 
 # Add more examples for each method
 Encode this example as a test.
@@ -168,17 +179,19 @@ This is so you get a fresh table contents every time you run the test suite.
 # file: spec/student_repository_spec.rb
 
 def reset_students_table
-  seed_sql = File.read('spec/seeds_students.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
+  seed_sql = File.read('spec/seeds_albums.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'music_library_test' })
   connection.exec(seed_sql)
 end
 
-describe StudentRepository do
+describe AlbumRepository do
   before(:each) do 
     reset_students_table
   end
 
   # (your tests will go here).
 end
+
+
 8. Test-drive and implement the Repository class behaviour
 After each test you write, follow the test-driving process of red, green, refactor to implement the behaviour.
