@@ -40,7 +40,7 @@ INSERT INTO albums (title,release_year,artist_id) VALUES ('Buzzard Buzzard Buzza
 
 Run this SQL file on the database to truncate (empty) the table, and insert the seed data. Be mindful of the fact any existing records in the table will be deleted.
 
-psql -h 127.0.0.1 music_library_test < spec/seeds_artists.sql
+psql -h 127.0.0.1 music_library_test < spec/seeds_albums.sql
 
 
 3. Define the class names
@@ -56,10 +56,11 @@ attr_accessor :title, :id, :release_year
 end
 
 # Repository class
-# (in lib/student_repository.rb)
 class AlbumRepository
 
 def all_albums
+#executes the SQL suery
+
 albums = []
 sql = 'SELECT id, title FROM albums;'
 album_set = DatabaseConnection.exec_params(sql,[])
@@ -67,33 +68,26 @@ album_set.each do |album|
   albums.push("#{album[:id]}: #{album[:title]}")
 end
 albums
-
+#returns an array of Album objects
 end
+
+#select a single album record
+#given its id in argument (a number)
+
+def find(id)
+#executes the SQL
+#SELECT id,title, release_year, artist_id FROM albums WHERE id =$1;
+
+#returns a single object 
 
 
 4. Implement the Model class
 Define the attributes of your Model class. You can usually map the table columns to the attributes of the class, including primary and foreign keys.
 
-# EXAMPLE
-# Table name: students
-
-# Model class
-# (in lib/student.rb)
-
-class Student
-
-  # Replace the attributes by your own columns.
-  attr_accessor :id, :name, :cohort_name
+class Album
+attr_accessor :title, :id, :release_year
 end
 
-# The keyword attr_accessor is a special Ruby feature
-# which allows us to set and get attributes on an object,
-# here's an example:
-#
-# student = Student.new
-# student.name = 'Jo'
-# student.name
-You may choose to test-drive this class, but unless it contains any more logic than the example above, it is probably not needed.
 
 5. Define the Repository Class interface
 Your Repository class will need to implement methods for each "read" or "write" operation you'd like to run against the database.
@@ -144,25 +138,33 @@ list_of_albums[1].release_year # =>  2022
 
 
 # 2
-# Create a single album 
+# Get all albums when there are no albums in the databse
 
-album = AlbumRepository.new
+albums = AlbumRepository.new
+list_of_albums = albums.all # =>[]
 
-new_addition = album.create('Bob Marley Greatest Hits',1990,'6')
-album.all => 'Bob Marley Greatest Hits',1990,'6'
+#3
+# Get a single album ('Louis Armstrong Hits')
+
+albums = AlbumRepository.new
+list_of_albums = albums.find(1)
+
+list_of_albums.title # => 'Louis Armstrong Hits'
+list_of_albums.id # => '1'
+list_of_albums.release_year # => '1970'
 
 
-##3 delete a single album 
-new_addition = album.create('Bob Marley Greatest Hits',1990,'6')
-album.delete(id)
-album.all => []
 
+#4 
+# Get a single album ('Buzzard Buzzard Buzzard')
 
-##4 update album
-new_addition = album.create('Bub Marley Greatest Hits',1990,'6')
-album.all => 'Bub Marley Greatest Hits',1990,'6'
-album.update(id,updated_title,updated_year)
-album.all => 
+albums = AlbumRepository.new
+list_of_albums = albums.find(2)
+
+list_of_albums.title # => 'Buzzard Buzzard Buzzard'
+list_of_albums.id # => '2'
+list_of_albums.release_year # => '2022'
+
 
 
 
