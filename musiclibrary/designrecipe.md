@@ -81,6 +81,12 @@ def find(id)
 #returns a single object 
 
 
+def create(album)
+
+#INSERTS into album (title,release_year,artist id) VALUES ($1, $2, $3);
+#returns nothing 
+end 
+
 4. Implement the Model class
 Define the attributes of your Model class. You can usually map the table columns to the attributes of the class, including primary and foreign keys.
 
@@ -165,6 +171,21 @@ list_of_albums.title # => 'Buzzard Buzzard Buzzard'
 list_of_albums.id # => '2'
 list_of_albums.release_year # => '2022'
 
+
+
+#5
+# Create a single album 
+
+albums = AlbumRepository.new
+album.title = '30'
+album.id = '3' 
+album.release_year = '2021'
+
+repo.create(album)
+
+all albums = repo.all
+
+# the all_albums array should contain the new Album object 
 
 
 

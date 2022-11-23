@@ -41,4 +41,24 @@ end
     expect(list_of_albums.release_year).to eq("2022")
     expect(list_of_albums.id).to eq("2")
   end
+
+  it 'creates a new album' do 
+    repo = AlbumRepository.new
+    new_album = Album.new
+    new_album.title = '30'
+    new_album.release_year = '2021'
+    new_album.id = '4' 
+
+   repo.create(new_album)
+
+   all_albums = repo.all
+
+   expect(all_albums).to include(
+    have_attributes(
+      title: new_album.title, 
+      release_year: '2021',
+      id: '4',
+    )
+   )
+  end
 end
