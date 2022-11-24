@@ -5,7 +5,7 @@ RSpec.describe AlbumRepository do
 
   def reset_albums_table
   seed_sql = File.read("spec/seeds_albums.sql")
-  connection = PG.connect({ host: "127.0.0.1", dbname: "albums_test" })
+  connection = PG.connect({ host: "127.0.0.1", dbname: "albums_artists_test" })
   connection.exec(seed_sql)
 end
 
