@@ -2,6 +2,7 @@
 Copy this recipe template to design and create two related database tables from a specification.
 
 1. Extract nouns from the user stories or specification
+
 # EXAMPLE USER STORY:
 # (analyse only the relevant part - here the final line).
 
@@ -25,94 +26,109 @@ As a social network user,
 So I can know who reads my posts,
 I'd like each of my posts to have a number of views.
 
-
-
-
-
 Nouns:
 
-album, title, release year, artist, name
+user account, email address , username 
+post, title, content , views, user_account_id 
+
+
+Table: user_accounts
+id: SERIAL
+username: text
+email_address: text
+
+Table: posts
+id: SERIAL
+title: text
+content: text
+views: int
+user_account_id: int
+
 
 
 2. Infer the Table Name and Columns
 Put the different nouns in this table. Replace the example with your own nouns.
 
-Record	Properties
-album	title, release year
-artist	name
-Name of the first table (always plural): albums
 
-Column names: title, release_year
+Name of the first table (always plural): user_accounts
 
-Name of the second table (always plural): artists
+Column names: username , email_address
 
-Column names: name
+Name of the second table (always plural): posts
+
+Column names: title,content,views,user_account_id 
+
+
+| Record        | Properties                            |
+| -----------   | -------------------------------       |
+| user_accounts | username, email_address               |
+| posts         | title, content, views,user_account_id |
+
+
+
 
 3. Decide the column types.
-Here's a full documentation of PostgreSQL data types.
 
-Most of the time, you'll need either text, int, bigint, numeric, or boolean. If you're in doubt, do some research or ask your peers.
-
-Remember to always have the primary key id as a first column. Its type will always be SERIAL.
-
-# EXAMPLE:
-
-Table: albums
+```
+Table: user_accounts 
 id: SERIAL
-title: text
-release_year: int
+username: text
+email_address: text
 
-Table: artists
+Table: posts
 id: SERIAL
-name: text
+title: text 
+content: text 
+views:  int
+user_account_id: int 
+
+```
+
+
 4. Decide on The Tables Relationship
-Most of the time, you'll be using a one-to-many relationship, and will need a foreign key on one of the two tables.
 
-To decide on which one, answer these two questions:
 
-Can one [TABLE ONE] have many [TABLE TWO]? (Yes/No)
-Can one [TABLE TWO] have many [TABLE ONE]? (Yes/No)
-You'll then be able to say that:
+Can one user_account have many posts? (Yes)
+Can one post have many user_accounts? (No)
 
-[A] has many [B]
-And on the other side, [B] belongs to [A]
-In that case, the foreign key is in the table [B]
-Replace the relevant bits in this example with your own:
+Therefore,
 
-# EXAMPLE
+--> A user account can HAVE MANY posts 
+--> A post BELONGS to only one user account 
 
-1. Can one artist have many albums? YES
-2. Can one album have many artists? NO
+Therefore, the foreign key is on the posts table (user_account_id)
 
--> Therefore,
--> An artist HAS MANY albums
--> An album BELONGS TO an artist
 
--> Therefore, the foreign key is on the albums table.
-If you can answer YES to the two questions, you'll probably have to implement a Many-to-Many relationship, which is more complex and needs a third table (called a join table).
+
 
 4. Write the SQL.
--- EXAMPLE
--- file: albums_table.sql
 
--- Replace the table name, columm names and types.
 
 -- Create the table without the foreign key first.
-CREATE TABLE artists (
+
+CREATE TABLE user_account (
   id SERIAL PRIMARY KEY,
-  name text,
+  user_name text,
+  email_address text
 );
 
+
 -- Then the table with the foreign key first.
-CREATE TABLE albums (
+
+
+
+CREATE TABLE posts (
   id SERIAL PRIMARY KEY,
   title text,
-  release_year int,
+  content text,
+  views int,
 -- The foreign key name is always {other_table_singular}_id
-  artist_id int,
-  constraint fk_artist foreign key(artist_id)
-    references artists(id)
+  user_account_id int,
+  constraint fk_user_account foreign key(user_account_id)
+    references user_account(id)
     on delete cascade
 );
+
+
 5. Create the tables.
-psql -h 127.0.0.1 database_name < albums_table.sql
+psql -h 127.0.0.1 social_network < social_network_table.sql
