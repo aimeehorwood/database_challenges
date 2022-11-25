@@ -11,12 +11,13 @@ describe CohortRepository do
     reset_cohorts_table
   end
 
+  
   it "finds cohort and its students " do
     repo = CohortRepository.new
     cohort = repo.find_with_students(1)
-    expect(cohort.name).to eq("R")
-    expect(artist.students.length).to eq(2)
     expect(cohort.students.first.name).to eq ("Toby")
+    expect(cohort.students.length).to eq (2)
     expect(cohort.starting_date).to eq("2022-01-01")
   end
 end
+

@@ -1,3 +1,6 @@
+require_relative './cohort'
+require_relative './student'
+
 class CohortRepository
   def find_with_students(id)
 
@@ -10,21 +13,21 @@ class CohortRepository
 
     result = DatabaseConnection.exec_params(sql, params)
 
-    students = Student.new
+    cohort = Cohort.new
 
-    students.id = result.first["id"]
-    students.name = result.first["name"]
-    students.starting_date = result.first["starting_date"]
+    cohort.id = result.first["id"]
+    cohort.name = result.first["name"]
+    cohort.starting_date = result.first["starting_date"]
 
     result.each do |record|
-      cohort_find = Cohort.new
-      cohort_find.id = record["id"]
-      cohort_find.name = record["name"]
-      cohort_find.starting_date = record["starting_date"]
+      student_find = Student.new
+      student_find.id = record["id"]
+      student_find.name = record["name"]
+      student_find.cohort_id = record["cohort_id"]
 
-     student.students << cohort_find
+     cohort.students << student_find
     end
 
-    return students
+    return cohort
   end
 end
