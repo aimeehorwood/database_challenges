@@ -16,7 +16,7 @@ class CohortRepository
     cohort = Cohort.new
 
     cohort.id = result.first["id"]
-    cohort.name = result.first["name"]
+    cohort.name = result.first["cohort_name"]
     cohort.starting_date = result.first["starting_date"]
 
     result.each do |record|

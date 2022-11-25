@@ -1,15 +1,18 @@
 # file: app.rb
 
 require_relative 'lib/database_connection'
+require_relative 'lib/cohort_repository'
+require_relative 'lib/student'
 
 # We need to give the database name to the method `connect`.
-DatabaseConnection.connect('student_directory_2')
+DatabaseConnection.connect('student_directory_2_test')
 
-# Perform a SQL query on the database and get the result set.
-# sql = 'SELECT id, title FROM albums;'
-result = DatabaseConnection.exec_params(sql, [])
+repo = CohortRepository.new
 
-# Print out each record from the result set .
-result.each do |record|
-  p record
-end
+cohort = repo.find_with_students(1)
+
+
+puts cohort.name
+
+cohort.students.each {|student| p student.name}
+

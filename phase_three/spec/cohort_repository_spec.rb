@@ -12,12 +12,21 @@ describe CohortRepository do
   end
 
   
-  it "finds cohort and its students " do
+  it "finds cohort R and its students " do
     repo = CohortRepository.new
     cohort = repo.find_with_students(1)
     expect(cohort.students.first.name).to eq ("Toby")
     expect(cohort.students.length).to eq (2)
     expect(cohort.starting_date).to eq("2022-01-01")
+    expect(cohort.name).to eq("R")
   end
-end
 
+  it "finds cohort M and its students " do
+    repo = CohortRepository.new
+    cohort = repo.find_with_students(2)
+    expect(cohort.students.first.name).to eq ("Rupa")
+    expect(cohort.students.length).to eq (2)
+    expect(cohort.starting_date).to eq("2022-02-07")
+    expect(cohort.name).to eq("M")
+   end
+end 
